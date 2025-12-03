@@ -5,5 +5,7 @@ const routes = new Router();
 
 //ROTAS
 routes.get("/especialidade", (req, res) => SystemController.listarEspecialidades(req,res));
+routes.get("/especialidade/:id", (req, res) => SystemController.obterIdEspecialidade(req,res));
+routes.post("/especialidade", (req, res) => SystemController.inserirEspecialidade(req,res));
 
 module.exports = routes;
