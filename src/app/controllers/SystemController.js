@@ -124,17 +124,23 @@ class SystemController {
     const pool = await UtilsFF.conectarSQLServer();
     if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
 
-    const mensagens = req.body.descricao;
+    const {id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente} = req.body;
 
     let baseQuery = `
             INSERT INTO mensagens(id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente)
             OUTPUT INSERTED.id
-            VALUES(@mensagens);
+            VALUES(@colaborador, @especialidade, @mensagem, @data, @nome, @email, @telefone);
         `;
 
     const request = pool.request();
     const result = await request
-      .input("mensagens", mensagens.mensagem_paciente)
+      .input("colaborador", id_colaborador)
+      .input("especialidade", id_especialidade)
+      .input("mensagem", mensagem_paciente)
+      .input("data", data)
+      .input("nome", nome_paciente)
+      .input("email", email_paciente)
+      .input("telefone", telefone_paciente)
       .query(baseQuery);
 
     if (!result.recordset.length) {
@@ -149,7 +155,6 @@ class SystemController {
 
     return res.status(201).json(idmensagens);
   }
-
 }
 
 module.exports = new SystemController();
