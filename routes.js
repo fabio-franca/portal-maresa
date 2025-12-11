@@ -7,5 +7,10 @@ const routes = new Router();
 routes.get("/especialidade", (req, res) => SystemController.listarEspecialidades(req,res));
 routes.get("/especialidade/:id", (req, res) => SystemController.obterIdEspecialidade(req,res));
 routes.post("/especialidade", (req, res) => SystemController.inserirEspecialidade(req,res));
+routes.post("/mensagens", (req, res) => SystemController.inserirmensagens(req,res));
+routes.get("/mensagens/", (req, res) => SystemController.listarmensagens(req, res));
+routes.get("/mensagens/:id", (req, res) => SystemController.obterIdmensagens(req, res));
 
 module.exports = routes;
+
+
