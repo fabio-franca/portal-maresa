@@ -10,6 +10,9 @@ routes.post("/especialidade", (req, res) => SystemController.inserirEspecialidad
 routes.post("/mensagens", (req, res) => SystemController.inserirmensagens(req,res));
 routes.get("/mensagens/", (req, res) => SystemController.listarmensagens(req, res));
 routes.get("/mensagens/:id", (req, res) => SystemController.obterIdmensagens(req, res));
+routes.post("/colaboradores", (req, res) => SystemController.inserircolaboradores(req,res));
+routes.get("/colaboradores/", (req, res) => SystemController.listarcolaboradores(req, res));
+routes.get("/colaboradores/:id", (req, res) => SystemController.obterIdcolaboradores(req, res));
 
 module.exports = routes;
 
