@@ -163,7 +163,7 @@ async listarcolaboradores(req, res) {
     if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
 
     let baseQuery = `
-            SELECT id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente FROM colaboradores;
+            SELECT id, nome, telefone, data, email FROM colaborador;
         `;
 
     const request = pool.request();
@@ -184,8 +184,7 @@ async listarcolaboradores(req, res) {
     const idcolaboradores = req.params.id;
 
     let baseQuery = `
-            SELECT id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente
-              FROM mensagens
+            SELECT id, nome, telefone, email FROM colaborador
              WHERE id = @idcolaboradores ;
         `;
 
@@ -205,23 +204,19 @@ async listarcolaboradores(req, res) {
     const pool = await UtilsFF.conectarSQLServer();
     if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
 
-    const {id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente} = req.body;
+    const {nome, telefone, email} = req.body;
 
     let baseQuery = `
-            INSERT INTO mensagens(id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente)
+            INSERT INTO colaborador(nome, telefone, email)
             OUTPUT INSERTED.id
-            VALUES(@colaborador, @especialidade, @mensagem, @data, @nome, @email, @telefone);
+            VALUES(@nome, @telefone, @email);
         `;
 
     const request = pool.request();
     const result = await request
-      .input("colaborador", id_colaborador)
-      .input("especialidade", id_especialidade)
-      .input("mensagem", mensagem_paciente)
-      .input("data", data)
-      .input("nome", nome_paciente)
-      .input("email", email_paciente)
-      .input("telefone", telefone_paciente)
+      .input("nome", nome)
+      .input("email", email)
+      .input("telefone", telefone)
       .query(baseQuery);
 
     if (!result.recordset.length) {
