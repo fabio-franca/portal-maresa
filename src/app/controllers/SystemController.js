@@ -76,9 +76,9 @@ class SystemController {
   }
 
 
-  
 
-   async listarmensagens(req, res) {
+
+  async listarmensagens(req, res) {
     const pool = await UtilsFF.conectarSQLServer();
     if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
 
@@ -124,7 +124,7 @@ class SystemController {
     const pool = await UtilsFF.conectarSQLServer();
     if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
 
-    const {id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente} = req.body;
+    const { id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente } = req.body;
 
     let baseQuery = `
             INSERT INTO mensagens(id_colaborador, id_especialidade, mensagem_paciente, data, nome_paciente, email_paciente, telefone_paciente)
@@ -156,7 +156,7 @@ class SystemController {
     return res.status(201).json(idmensagens);
   }
 
-async listarcolaboradores(req, res) {
+  async listarcolaboradores(req, res) {
     const pool = await UtilsFF.conectarSQLServer();
     if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
 
@@ -173,7 +173,7 @@ async listarcolaboradores(req, res) {
 
     return res.status(200).json(result.recordset);
   }
-  
+
 
   async obterIdcolaboradores(req, res) {
     const pool = await UtilsFF.conectarSQLServer();
@@ -203,7 +203,7 @@ async listarcolaboradores(req, res) {
     const pool = await UtilsFF.conectarSQLServer();
     if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
 
-    const {nome, telefone, email} = req.body;
+    const { nome, telefone, email } = req.body;
 
     let baseQuery = `
             INSERT INTO colaborador(nome, telefone, email)
@@ -230,6 +230,87 @@ async listarcolaboradores(req, res) {
 
     return res.status(201).json(idcolaboradores);
   }
+
+  async listarEspecialidadesColaborador(req, res) {
+    const pool = await UtilsFF.conectarSQLServer();
+    if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
+
+    let baseQuery = `
+            SELECT ec.id, ec.id_colaborador, ec.id_especialidade
+                  ,e.descricao AS especialidade
+                  ,c.nome AS colaborador
+              FROM especialidades_colaborador ec
+             INNER JOIN especialidades e
+                ON e.id = ec.id_especialidade
+             INNER JOIN colaborador c
+                ON c.id = ec.id_colaborador;
+        `;
+
+    const request = pool.request();
+    const result = await request.query(baseQuery);
+
+    if (!result.recordset.length) {
+      return res.status(404).json({ message: "Nenhum registro encontrado." });
+    }
+
+    return res.status(200).json(result.recordset);
+  }
+
+  async inserirEspecialidadecolaborador(req, res) {
+    const pool = await UtilsFF.conectarSQLServer();
+    if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
+
+    const { id_colaborador, id_especialidade } = req.body;
+
+    let baseQuery = `
+            INSERT INTO especialidades_colaborador(id_colaborador, id_especialidade)
+            OUTPUT INSERTED.id
+            VALUES(@colaborador, @especialidade);
+        `;
+
+    const request = pool.request();
+    const result = await request
+      .input("colaborador", id_colaborador)
+      .input("especialidade", id_especialidade)
+      .query(baseQuery);
+
+    if (!result.recordset.length) {
+      return res.status(404).json({ message: "Nenhum registro encontrado." });
+    }
+
+    const idEspecialidadeColaborador = result.recordset?.[0]?.id || null;
+
+    if (!idEspecialidadeColaborador) {
+      return res.status(400).json({ message: "Falha ao obter o ID" });
+    }
+
+    return res.status(201).json(idEspecialidadeColaborador);
+  }
+
+  async obterIdEspecialidadecolaborador(req, res) {
+    const pool = await UtilsFF.conectarSQLServer();
+    if (!pool) return res.status(500).json({ error: "Falha na conexão com o banco de dados." });
+
+    const idEspecialidadecolaborador = req.params.id;
+
+    let baseQuery = `
+            SELECT id, id_colaborador, id_especialidade 
+            FROM especialidades_colaborador
+             WHERE id_colaborador = @colaborador ;
+        `;
+
+    const request = pool.request();
+    const result = await request
+      .input("colaborador", idEspecialidadecolaborador)
+      .query(baseQuery);
+
+    if (!result.recordset.length) {
+      return res.status(404).json({ message: "Nenhum registro encontrado." });
+    }
+
+    return res.status(200).json(result.recordset);
+  }
+
 }
 
 module.exports = new SystemController();

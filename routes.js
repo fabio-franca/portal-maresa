@@ -13,6 +13,9 @@ routes.get("/mensagens/:id", (req, res) => SystemController.obterIdmensagens(req
 routes.post("/colaboradores", (req, res) => SystemController.inserircolaboradores(req,res));
 routes.get("/colaboradores", (req, res) => SystemController.listarcolaboradores(req, res));
 routes.get("/colaboradores/:id", (req, res) => SystemController.obterIdcolaboradores(req, res));
+routes.get("/especialidadecolaborador", (req, res) => SystemController.listarEspecialidadesColaborador(req, res));
+routes.post("/especialidadecolaborador", (req, res) => SystemController.inserirEspecialidadecolaborador(req,res));
+routes.get("/especialidadecolaborador/:id", (req, res) => SystemController.obterIdEspecialidadecolaborador(req,res));
 
 module.exports = routes;
 
